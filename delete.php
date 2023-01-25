@@ -1,13 +1,13 @@
 <?php
 include_once 'connexion.php';
 
-$statement = $pdo->query("SELECT * FROM `mes_jeux` ORDER BY id");
+$statement = $pdo->query("SELECT * FROM `jeux` ORDER BY id_jeux");
 // Renvoie la table mes_jeux
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 // Récupération et filtrage du paramètre POST
 $options = array(
-    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id']),
+    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id_jeux']),
     'flags' => FILTER_NULL_ON_FAILURE
 );
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, $options);
@@ -27,7 +27,7 @@ if (!isset($id)) {
 }
 
 if (isset($OK) and !empty($OK) and $OK == "Confirmer") {
-    $sql = "DELETE FROM `mes_jeux` WHERE id = :id";
+    $sql = "DELETE FROM `jeux` WHERE id_jeux = :id";
     $statement = $pdo->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     try {

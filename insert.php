@@ -32,11 +32,26 @@ if (!isset($console) or !isset($nom)) {
     echo "<a href='index.php'>Retour à l'accueil</a>";
     die;
 } else {
-    //Pour des marqueurs plus explicite
-    $sql = " INSERT INTO mes_jeux ( nom, console ) VALUES ( :nom, :console )";
+    $sql = "SELECT * FROM console WHERE nom_console = :nom_console";
     $statement = $pdo->prepare($sql);
-    $statement->bindParam(':nom', $nom, PDO::PARAM_STR);
-    $statement->bindParam(':console', $console, PDO::PARAM_STR);
+    $statement->bindParam(':nom_console', $console, PDO::PARAM_STR);
+    $statement->execute();
+    $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+    if ($result == false) {
+        $sql = "INSERT INTO console (nom_console) VALUES (:nom_console)";
+        $statement = $pdo->prepare($sql);
+        $statement->bindParam(':nom_console', $console, PDO::PARAM_STR);
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        print_r($result);
+    }
+
+    //Requete pour ajouter le jeux
+    $sql = " INSERT INTO jeux ( nom_jeux, console_id ) VALUES ( :nom_jeux, :console_id )";
+    $statement = $pdo->prepare($sql);
+    $statement->bindParam(':nom_jeux', $nom, PDO::PARAM_STR);
+    $statement->bindParam(':console_id', $result["id_console"], PDO::PARAM_INT);
 };
 
 try {

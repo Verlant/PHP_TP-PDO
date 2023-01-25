@@ -3,11 +3,11 @@
 include_once 'connexion.php';
 
 // Renvoie la table mes_jeux
-$statement = $pdo->query("SELECT * FROM `mes_jeux` ORDER BY id");
+$statement = $pdo->query("SELECT * FROM `jeux` ORDER BY id_jeux");
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 $options = array(
-    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id']),
+    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id_jeux']),
     'flags' => FILTER_NULL_ON_FAILURE
 );
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT, $options);
@@ -26,7 +26,7 @@ if (!isset($console) or !isset($nom) or !isset($id)) {
     die;
 } else {
     //Pour des marqueurs plus explicite
-    $sql = " UPDATE mes_jeux SET nom = :nom, console = :console WHERE id = :id";
+    $sql = " UPDATE jeux SET nom_jeux = :nom, console = :console WHERE id = :id";
     $statement = $pdo->prepare($sql);
     $statement->bindParam(':id', $id, PDO::PARAM_INT);
     $statement->bindParam(':nom', $nom, PDO::PARAM_STR);

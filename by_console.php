@@ -1,33 +1,39 @@
 <?php
 include_once 'connexion.php';
 
+// Renvoie la table console
+$statement = $pdo->query("SELECT * FROM `console` ORDER BY id_console");
+$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 // Récupération et filtrage du paramètre GET
-$regexp = '/^[A-Za-z0-9\s]*$|^$/';
 $options = array(
-    'options' => array('regexp' => $regexp),
+    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id_console']),
     'flags' => FILTER_NULL_ON_FAILURE
 );
-$console = filter_input(INPUT_GET, 'console');
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, $options);
+
+$statement = $pdo->query("SELECT * FROM `console` WHERE id_console = '$id'");
+$result = $statement->fetch(PDO::FETCH_ASSOC);
+$console = $result['nom_console'];
 
 // Vérification de l'existance et la valeur de la variable provenant du paramètre GET
-if (!isset($console)) {
-    echo "Erreur, la variable console est inexistante<br/>";
+if (!isset($id)) {
+    echo "Erreur, la variable id est inexistante<br/>";
     echo "<a href='index.php'>Retour à l'accueil</a>";
     die;
-} else if (empty($console)) {
-    echo "Erreur, la variable console est vide<br/>";
+} else if (empty($id)) {
+    echo "Erreur, la variable id est vide<br/>";
     echo "<a href='index.php'>Retour à l'accueil</a>";
     die;
 } else {
-    $sql = " SELECT * FROM mes_jeux WHERE console=:console ORDER BY nom";
+    $sql = " SELECT * FROM jeux JOIN console ON console_id = id_console WHERE id_console=:console ORDER BY nom_jeux";
     $statement = $pdo->prepare($sql);
-    $statement->bindParam(':console', $console, PDO::PARAM_STR);
+    $statement->bindParam(':console', $id, PDO::PARAM_INT);
     $statement->execute();
 };
 
-
-
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,10 +50,10 @@ $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         <h1>Ma liste de jeux vidéos sur la console <?= $console ?>:</h1>
         <ul>
             <?php foreach ($result as $index => $table_row) : ?>
-                <li><?= $table_row['nom'] ?>
+                <li><?= $table_row['nom_jeux'] ?>
                     <ul>
-                        <li><a href="show_one.php?id=<?= $table_row['id'] ?>">Voir ce jeu en détail</a></li>
-                        <li><a href="form_update.php?id=<?= $table_row['id'] ?>">Modifier ce jeux</a></li>
+                        <li><a href="show_one.php?id=<?= $table_row['id_jeux'] ?>">Voir ce jeu en détail</a></li>
+                        <li><a href="form_update.php?id=<?= $table_row['id_jeux'] ?>">Modifier ce jeux</a></li>
                     </ul>
                 </li><br />
             <?php endforeach ?>

@@ -2,7 +2,7 @@
 //Instancie l'objet PDO
 include_once 'connexion.php';
 // Utilise la méthode query afin de récupérer un PDOStatement
-$statement = $pdo->query("SELECT * FROM `mes_jeux` ORDER BY id");
+$statement = $pdo->query("SELECT * FROM `jeux` ORDER BY id_jeux");
 
 // Récupère le résultat
 // $result = $statement->fetch(PDO::FETCH_OBJ);
@@ -12,7 +12,7 @@ $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 // Récupération et filtrage du paramètre GET
 $options = array(
-    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id']),
+    'options' => array('min_range' => 1, 'max_range' => $result[count($result) - 1]['id_jeux']),
     'flags' => FILTER_NULL_ON_FAILURE
 );
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, $options);
@@ -52,9 +52,13 @@ $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, $options);
 // fetchAll() ignorera la ligne de requete renvoyé par fetch() et renverra toutes les lignes restante non traité par une methode fetch()
 // Pour notre requete le methode fetchAll() est a utilisé car cette requete renvoie plus qu'une ligne.
 
-$statement = $pdo->query("SELECT * FROM `mes_jeux` ORDER BY nom");
+$statement = $pdo->query("SELECT * FROM `jeux` JOIN `console` ON console_id = id_console ORDER BY nom_jeux");
 $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+$statement_console = $pdo->query("SELECT * FROM console");
+$result_console = $statement_console->fetchAll(PDO::FETCH_ASSOC);
+
+// var_dump($result_console);
 // var_dump($result);
 // $id = $result[0]["id"];
 // $id = 0;
@@ -73,20 +77,26 @@ $result = $statement->fetchAll(PDO::FETCH_ASSOC);
     <main>
         <h1>Listes des jeux classé par console</h1>
         <ul>
-            <li><a href="by_console.php?console=ps4">Tous les jeux PS4</a></li>
+            <!-- <li><a href="by_console.php?console=ps4">Tous les jeux PS4</a></li>
             <li><a href="by_console.php?console=xbox serie">Tous les jeux Xbox serie</a></li>
-            <li><a href="by_console.php?console=switch">Tous les jeux Switch</a></li>
+            <li><a href="by_console.php?console=switch">Tous les jeux Switch</a></li> -->
+
+            <?php foreach ($result_console as $index => $table_row) : ?>
+                <li><a href="by_console.php?id=<?= $table_row["id_console"] ?>">Tous les jeux <?= $table_row["nom_console"] ?></a></li>
+            <?php endforeach ?>
         </ul>
+
+
 
         <h1>Ma liste de jeux classé par ordre alphabétique</h1>
         <ul>
             <li><a href="form_insert.php">Ajouter un nouveau jeux</a></li><br />
             <?php foreach ($result as $index => $table_row) : ?>
-                <li><?= $table_row['nom'] ?> sur la console <?= $table_row['console'] ?>
+                <li><?= $table_row['nom_jeux'] ?> sur la console <?= $table_row['nom_console'] ?>
                     <ul>
-                        <li><a href="show_one.php?id=<?= $table_row['id'] ?>">Voir ce jeu en détail</a></li>
-                        <li><a href="form_update.php?id=<?= $table_row['id'] ?>">Modifier ce jeux</a></li>
-                        <li><a href="form_delete.php?id=<?= $table_row['id'] ?>">Supprimer ce jeux</a></li>
+                        <li><a href="show_one.php?id=<?= $table_row['id_jeux'] ?>">Voir ce jeu en détail</a></li>
+                        <li><a href="form_update.php?id=<?= $table_row['id_jeux'] ?>">Modifier ce jeux</a></li>
+                        <li><a href="form_delete.php?id=<?= $table_row['id_jeux'] ?>">Supprimer ce jeux</a></li>
                     </ul>
                 </li><br />
             <?php endforeach ?>
