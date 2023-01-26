@@ -12,7 +12,10 @@ $options = array(
 );
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, $options);
 
-$statement = $pdo->query("SELECT * FROM `console` WHERE id_console = '$id'");
+$sql = "SELECT * FROM `console` WHERE id_console = :id_console";
+$statement = $pdo->prepare($sql);
+$statement->bindParam(':id_console', $id, PDO::PARAM_INT);
+$statement->execute();
 $result = $statement->fetch(PDO::FETCH_ASSOC);
 $console = $result['nom_console'];
 
@@ -26,13 +29,13 @@ if (!isset($id)) {
     echo "<a href='index.php'>Retour à l'accueil</a>";
     die;
 } else {
-    $sql = " SELECT * FROM jeux JOIN console ON console_id = id_console WHERE id_console=:console ORDER BY nom_jeux";
+    $sql = " SELECT * FROM jeux JOIN console ON console_id = id_console WHERE id_console=:id_console ORDER BY nom_jeux";
     $statement = $pdo->prepare($sql);
-    $statement->bindParam(':console', $id, PDO::PARAM_INT);
+    $statement->bindParam(':id_console', $id, PDO::PARAM_INT);
     $statement->execute();
+    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 };
 
-$result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>

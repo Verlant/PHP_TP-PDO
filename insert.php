@@ -38,29 +38,32 @@ if (!isset($console) or !isset($nom)) {
     $statement->execute();
     $result = $statement->fetch(PDO::FETCH_ASSOC);
 
+    $pdo->beginTransaction();
+
     if ($result == false) {
-        $sql = "INSERT INTO console (nom_console) VALUES (:nom_console)";
-        $statement = $pdo->prepare($sql);
-        $statement->bindParam(':nom_console', $console, PDO::PARAM_STR);
-        $statement->execute();
+        $sql_console = "INSERT INTO console (nom_console) VALUES (:nom_console)";
+        $statement_console = $pdo->prepare($sql_console);
+        $statement_console->bindParam(':nom_console', $console, PDO::PARAM_STR);
+        $statement_console->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         print_r($result);
     }
 
     //Requete pour ajouter le jeux
-    $sql = " INSERT INTO jeux ( nom_jeux, console_id ) VALUES ( :nom_jeux, :console_id )";
-    $statement = $pdo->prepare($sql);
-    $statement->bindParam(':nom_jeux', $nom, PDO::PARAM_STR);
-    $statement->bindParam(':console_id', $result["id_console"], PDO::PARAM_INT);
+    $sql_jeux = " INSERT INTO jeux ( nom_jeux, console_id ) VALUES ( :nom_jeux, :console_id )";
+    $statement_jeux = $pdo->prepare($sql_jeux);
+    $statement_jeux->bindParam(':nom_jeux', $nom, PDO::PARAM_STR);
+    $statement_jeux->bindParam(':console_id', $result["id_console"], PDO::PARAM_INT);
 };
 
 try {
-    $statement->execute();
+    $statement_jeux->execute();
     echo "Le jeu n°" . $pdo->lastInsertId() . " a été enregistré avec succès.<br/>";
+    $pdo->commit();
 } catch (PDOException $e) {
     //throw $th;
     // var_dump($th);
-    // echo $e->getMessage();
+    echo $e->getMessage();
     echo "Une erreur est survenue lors de l'execution d'une requete à la base de donné.";
 }
 ?>

@@ -25,20 +25,35 @@ if (!isset($console) or !isset($nom) or !isset($id)) {
     echo "<a href='index.php'>Retour à l'accueil</a>";
     die;
 } else {
-    //Pour des marqueurs plus explicite
-    $sql = " UPDATE jeux SET nom_jeux = :nom, console = :console WHERE id = :id";
+    $sql = "SELECT * FROM console WHERE nom_console = :nom_console";
     $statement = $pdo->prepare($sql);
-    $statement->bindParam(':id', $id, PDO::PARAM_INT);
-    $statement->bindParam(':nom', $nom, PDO::PARAM_STR);
-    $statement->bindParam(':console', $console, PDO::PARAM_STR);
+    $statement->bindParam(':nom_console', $console, PDO::PARAM_STR);
+    $statement->execute();
+    $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+    // $pdo->beginTransaction();
+
+    if ($result == false) {
+        echo "La console " . $console . " n'existe pas, réessayez avec une console déjà existante.<br/>";
+        echo "<a href='index.php'>Retour à l'accueil</a>";
+        die;
+    }
+
+    //Pour des marqueurs plus explicite
+    $sql_jeux = " UPDATE jeux SET nom_jeux = :nom_jeux, console_id = :console_id WHERE id_jeux = :id_jeux";
+    $statement_jeux = $pdo->prepare($sql_jeux);
+    $statement_jeux->bindParam(':id_jeux', $id, PDO::PARAM_INT);
+    $statement_jeux->bindParam(':nom_jeux', $nom, PDO::PARAM_STR);
+    $statement_jeux->bindParam(':console_id', $result["id_console"], PDO::PARAM_INT);
 }
 
 try {
-    $statement->execute();
+    $statement_jeux->execute();
     echo "Le jeu n°" . $id . " a été modifié avec succès.<br/>";
+    // $pdo->commit();
 } catch (PDOException $e) {
-    //throw $th;
-    // var_dump($th);
+    // throw $e;
+    // var_dump($e);
     // echo $e->getMessage();
     echo "Une erreur est survenue lors de l'execution d'une requete à la base de donné.";
 }
