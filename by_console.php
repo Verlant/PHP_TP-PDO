@@ -57,6 +57,7 @@ if (!isset($id)) {
                     <ul>
                         <li><a href="show_one.php?id=<?= $table_row['id_jeux'] ?>">Voir ce jeu en détail</a></li>
                         <li><a href="form_update.php?id=<?= $table_row['id_jeux'] ?>">Modifier ce jeux</a></li>
+                        <li><a href="form_delete.php?id=<?= $table_row['id_jeux'] ?>">Supprimer ce jeux</a></li>
                     </ul>
                 </li><br />
             <?php endforeach ?>
