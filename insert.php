@@ -36,7 +36,7 @@ if (!isset($console) or !isset($nom)) {
     $statement = $pdo->prepare($sql);
     $statement->bindParam(':nom_console', $console, PDO::PARAM_STR);
     $statement->execute();
-    $result = $statement->fetch(PDO::FETCH_ASSOC);
+    $result = $statement->fetch(PDO::FETCH_ASSOC)["id_console"];
 
     $pdo->beginTransaction();
 
@@ -45,15 +45,13 @@ if (!isset($console) or !isset($nom)) {
         $statement_console = $pdo->prepare($sql_console);
         $statement_console->bindParam(':nom_console', $console, PDO::PARAM_STR);
         $statement_console->execute();
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
-        print_r($result);
+        $result = $pdo->lastInsertId();
     }
-
     //Requete pour ajouter le jeux
     $sql_jeux = " INSERT INTO jeux ( nom_jeux, console_id ) VALUES ( :nom_jeux, :console_id )";
     $statement_jeux = $pdo->prepare($sql_jeux);
     $statement_jeux->bindParam(':nom_jeux', $nom, PDO::PARAM_STR);
-    $statement_jeux->bindParam(':console_id', $result["id_console"], PDO::PARAM_INT);
+    $statement_jeux->bindParam(':console_id', $result, PDO::PARAM_INT);
 };
 
 try {
